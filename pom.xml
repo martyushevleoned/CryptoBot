@@ -28,14 +28,12 @@
 
     <dependencyManagement>
         <dependencies>
-
             <!-- https://mvnrepository.com/artifact/org.telegram/telegrambots -->
             <dependency>
                 <groupId>org.telegram</groupId>
                 <artifactId>telegrambots</artifactId>
                 <version>${telegrambots.version}</version>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
 
