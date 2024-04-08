@@ -2,41 +2,75 @@ package project.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import project.controller.menuController.CurrenciesMenu;
+import project.controller.menuController.CurrenciesGroupMenu;
 import project.controller.menuController.MainMenu;
-import project.utils.MessageUtils;
+import project.controller.menuController.TrackedCurrenciesMenu;
+import project.controller.menuController.factory.Menu;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class UpdateController {
 
-    @Autowired
-    private MessageUtils messageUtils;
+    private TelegramBot bot;
+    private List<Menu> menuList;
 
     @Autowired
     private MainMenu mainMenu;
+    @Autowired
+    private CurrenciesGroupMenu currenciesGroupMenu;
+    @Autowired
+    private CurrenciesMenu currenciesMenu;
 
-    public SendMessage processUpdate(Update update) {
-        Message message = update.getMessage();
-        return distributeMessageByType(message);
+    @Autowired
+    private TrackedCurrenciesMenu trackedCurrenciesMenu;
+
+    public void registerTelegramBot(TelegramBot telegramBot) {
+        this.bot = telegramBot;
+        menuList = new ArrayList<>();
+        menuList.add(mainMenu);
+        menuList.add(currenciesGroupMenu);
+        menuList.add(currenciesMenu);
+        menuList.add(trackedCurrenciesMenu);
     }
 
-    private SendMessage distributeMessageByType(Message message) {
+    public void processUpdate(Update update) {
+        try {
+            if (update.hasCallbackQuery()) {
+                processCallback(update);
 
-        if (message.hasText()) {
+            } else if (update.hasMessage() && update.getMessage().hasText()) {
+                processMessage(update);
 
-
-            if (mainMenu.match(message.getText()))
-                return mainMenu.getMenu(message);
-
-            return echo(message);
+            }
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
         }
-
-        return messageUtils.unsupportedMessage(message, "Unsupported messageType");
     }
 
-    private SendMessage echo(Message message) {
-        return new SendMessage(String.valueOf(message.getChatId()), message.getText());
+    private void processCallback(Update update) throws TelegramApiException {
+        String callbackData = update.getCallbackQuery().getData();
+
+        for (Menu m : menuList) {
+            if (m.match(callbackData)) {
+                bot.execute(m.getEditMessage(update));
+                break;
+            }
+        }
+    }
+
+    private void processMessage(Update update) throws TelegramApiException {
+        String messageText = update.getMessage().getText();
+
+        for (Menu m : menuList) {
+            if (m.match(messageText)) {
+                bot.execute(m.getSendMessage(update));
+                break;
+            }
+        }
     }
 }

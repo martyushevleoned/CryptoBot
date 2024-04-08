@@ -13,25 +13,19 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
-public class MainMenu implements Menu {
-
-    private final String text = "Главное меню";
+public class TrackedCurrenciesMenu implements Menu {
+    private final String text = "Список отслеживаемых валют";
 
     private final InlineKeyboardMarkup inlineKeyboardMarkup = InlineKeyboardMarkup.builder()
             .keyboardRow(List.of(
-                    InlineKeyboardButton.builder().text("все валюты").callbackData(MenuType.CURRENCY_GROUP_MENU.name()).build()
-            ))
-            .keyboardRow(List.of(
-                    InlineKeyboardButton.builder().text("отслеживаемые валюты").callbackData(MenuType.TRACKED_CURRENCIES_MENU.name()).build()
+                    InlineKeyboardButton.builder().text("назад").callbackData(MenuType.MAIN_MENU.name()).build()
             ))
             .build();
 
-
+    @Override
     public boolean match(String text) {
-        return Objects.equals(text, "/start") ||
-                Objects.equals(text, MenuType.MAIN_MENU.name());
+        return Objects.equals(text, MenuType.TRACKED_CURRENCIES_MENU.name());
     }
-
 
     @Override
     public SendMessage getSendMessage(Update update) {
@@ -52,4 +46,3 @@ public class MainMenu implements Menu {
         return editMessageText;
     }
 }
-

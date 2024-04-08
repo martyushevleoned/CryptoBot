@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import project.controller.menuController.factory.CurrencyType;
 import project.controller.menuController.factory.Menu;
 import project.controller.menuController.factory.MenuType;
 
@@ -13,25 +14,22 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
-public class MainMenu implements Menu {
-
-    private final String text = "Главное меню";
+public class CurrenciesMenu implements Menu {
+    private final String text = "Выберите валюту";
 
     private final InlineKeyboardMarkup inlineKeyboardMarkup = InlineKeyboardMarkup.builder()
             .keyboardRow(List.of(
-                    InlineKeyboardButton.builder().text("все валюты").callbackData(MenuType.CURRENCY_GROUP_MENU.name()).build()
-            ))
-            .keyboardRow(List.of(
-                    InlineKeyboardButton.builder().text("отслеживаемые валюты").callbackData(MenuType.TRACKED_CURRENCIES_MENU.name()).build()
+                    InlineKeyboardButton.builder().text("назад").callbackData(MenuType.CURRENCY_GROUP_MENU.name()).build()
             ))
             .build();
 
-
+    @Override
     public boolean match(String text) {
-        return Objects.equals(text, "/start") ||
-                Objects.equals(text, MenuType.MAIN_MENU.name());
+        for (CurrencyType c: CurrencyType.values())
+            if (Objects.equals(text, c.name()))
+                return true;
+        return false;
     }
-
 
     @Override
     public SendMessage getSendMessage(Update update) {
@@ -52,4 +50,3 @@ public class MainMenu implements Menu {
         return editMessageText;
     }
 }
-
