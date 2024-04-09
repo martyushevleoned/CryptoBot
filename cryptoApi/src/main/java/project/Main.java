@@ -1,21 +1,24 @@
 package project;
 
-import project.api.coinCapApi.CoinCapApi;
-import project.factory.Currency;
+import org.json.simple.parser.ParseException;
+import project.factory.enums.ApiEnum;
+import project.factory.enums.Currency;
+import project.factory.history.HistoryCurrencyApi;
 import project.factory.history.TimeInterval;
+import project.factory.price.PriceCurrencyApi;
 
 import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ParseException {
 
-        Currency currency = Currency.TETHER;
-        TimeInterval interval = TimeInterval.WEEK;
-        CoinCapApi currencyApi = new CoinCapApi();
+        PriceCurrencyApi priceCurrencyApi = (PriceCurrencyApi) ApiEnum.COIN_CAP.get();
+        HistoryCurrencyApi historyCurrencyApi = (HistoryCurrencyApi) ApiEnum.COIN_CAP.get();
 
-        double price = currencyApi.getCurrentPrice(currency);
-        System.out.println(price + " " + currency.getSymbol());
+        Currency currency = Currency.DOGECOIN;
+        TimeInterval timeInterval = TimeInterval.HOUR;
 
-        currencyApi.getHistory(currency, interval).forEach(System.out::println);
+        System.out.println(priceCurrencyApi.getPrice(currency));
+        System.out.println(historyCurrencyApi.getHistory(currency, timeInterval));
     }
 }

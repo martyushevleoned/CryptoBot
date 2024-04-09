@@ -1,12 +1,11 @@
 package project.factory;
 
+import project.factory.enums.Currency;
+
 import java.util.Set;
 
 public interface CurrencyApi {
 
-    String getApiName();
-
-    String getApiDescription();
-
+    String getName();
     Set<Currency> getCurrencies();
 }

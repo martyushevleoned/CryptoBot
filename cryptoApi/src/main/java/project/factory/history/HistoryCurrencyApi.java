@@ -1,6 +1,6 @@
 package project.factory.history;
 
-import project.factory.Currency;
+import project.factory.enums.Currency;
 import project.factory.CurrencyApi;
 
 import java.io.IOException;

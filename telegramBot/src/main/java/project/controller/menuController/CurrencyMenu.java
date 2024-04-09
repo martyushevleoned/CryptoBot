@@ -9,49 +9,48 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import project.controller.menuController.factory.Menu;
 import project.controller.menuController.factory.MenuType;
-import project.service.TrackService;
+import project.service.CurrencyService;
 import project.service.TrackedCurrencyDto;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 @Component
-public class TrackedCurrenciesMenu implements Menu {
+public class CurrencyMenu implements Menu {
 
     @Autowired
-    private TrackService trackService;
+    private CurrencyService currencyService;
 
-    private final String text = "Список отслеживаемых валют";
+    private String getText(TrackedCurrencyDto trackedCurrencyDto){
+        return currencyService.getInfoByTrackedCurrencyDto(trackedCurrencyDto);
+    }
 
-    private InlineKeyboardMarkup generateInlineKeyboardMarkup(long chatId) {
+    private InlineKeyboardMarkup generateInlineKeyboardMarkup() {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
-        Set<TrackedCurrencyDto> trackedCurrencies = trackService.getTrackedCurrencies(chatId);
-        trackedCurrencies.forEach(trackedCurrencyDto -> {
-            String text = trackedCurrencyDto.getText();
-            String callback = trackedCurrencyDto.getCallback();
-            rows.add((List.of(InlineKeyboardButton.builder().text(text).callbackData(callback).build())));
-        });
-
-        rows.add((List.of(InlineKeyboardButton.builder().text("назад").callbackData(MenuType.MAIN_MENU.toString()).build())));
+        rows.add((List.of(InlineKeyboardButton.builder().text("назад").callbackData(MenuType.TRACKED_CURRENCIES_MENU.toString()).build())));
         return new InlineKeyboardMarkup(rows);
     }
 
     @Override
     public boolean match(String text) {
-        return Objects.equals(text, MenuType.TRACKED_CURRENCIES_MENU.name());
+        try {
+            new TrackedCurrencyDto(text);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
     public SendMessage getSendMessage(Update update) {
         long chatId = update.getMessage().getChatId();
+        String text = update.getMessage().getText();
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(update.getMessage().getChatId());
-        sendMessage.setText(text);
-        sendMessage.setReplyMarkup(generateInlineKeyboardMarkup(chatId));
+        sendMessage.setText(getText(new TrackedCurrencyDto(text)));
+        sendMessage.setReplyMarkup(generateInlineKeyboardMarkup());
         return sendMessage;
     }
 
@@ -59,12 +58,13 @@ public class TrackedCurrenciesMenu implements Menu {
     public EditMessageText getEditMessage(Update update) {
         long chatId = update.getCallbackQuery().getMessage().getChatId();
         int messageId = update.getCallbackQuery().getMessage().getMessageId();
+        String callback = update.getCallbackQuery().getData();
 
         EditMessageText editMessageText = new EditMessageText();
         editMessageText.setChatId(chatId);
         editMessageText.setMessageId(messageId);
-        editMessageText.setText(text);
-        editMessageText.setReplyMarkup(generateInlineKeyboardMarkup(chatId));
+        editMessageText.setText(getText(new TrackedCurrencyDto(callback)));
+        editMessageText.setReplyMarkup(generateInlineKeyboardMarkup());
         return editMessageText;
     }
 }

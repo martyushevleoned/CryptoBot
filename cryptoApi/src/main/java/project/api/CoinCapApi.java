@@ -1,6 +1,6 @@
-package project.api.coinCapApi;
+package project.api;
 
-import project.factory.Currency;
+import project.factory.enums.Currency;
 import project.factory.history.HistoryCurrencyApi;
 import project.factory.history.HistoryDto;
 import project.factory.history.TimeInterval;
@@ -22,6 +22,7 @@ public class CoinCapApi implements PriceCurrencyApi, HistoryCurrencyApi {
         put(Currency.ETHEREUM, "ethereum");
         put(Currency.DOGECOIN, "dogecoin");
         put(Currency.TETHER, "tether");
+        put(Currency.BINANCECOIN, "binance-coin");
     }};
 
     private final HashMap<TimeInterval, String> intervals = new HashMap<>() {{  //m1, m5, m15, m30, h1, h2, h6, h12, d1
@@ -31,16 +32,8 @@ public class CoinCapApi implements PriceCurrencyApi, HistoryCurrencyApi {
     }};
 
     @Override
-    public String getApiName() {
-        return "CoinCap API 2.0";
-    }
-
-    /**
-     * @see <a href="https://docs.coincap.io/">Api docs</a>
-     */
-    @Override
-    public String getApiDescription() {
-        return "Official API of https://coincap.io/";
+    public String getName() {
+        return "Coin Cap";
     }
 
     @Override
@@ -49,13 +42,13 @@ public class CoinCapApi implements PriceCurrencyApi, HistoryCurrencyApi {
     }
 
     @Override
-    public double getCurrentPrice(Currency currency) throws IOException {
+    public double getPrice(Currency currency) throws IOException {
         if (!currencies.containsKey(currency))
             throw new InvalidParameterException("Currency is not supported");
 
         OkHttpClient client = new OkHttpClient().newBuilder().build();
         Request request = new Request.Builder()
-                .url("https://api.coincap.io/v2/rates/" + currency.toString().toLowerCase())
+                .url("https://api.coincap.io/v2/rates/" + currencies.get(currency))
                 .build();
 
         Response response = client.newCall(request).execute();

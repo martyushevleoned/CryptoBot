@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import project.controller.menuController.CurrenciesMenu;
-import project.controller.menuController.CurrenciesGroupMenu;
-import project.controller.menuController.MainMenu;
-import project.controller.menuController.TrackedCurrenciesMenu;
+import project.controller.menuController.*;
 import project.controller.menuController.factory.Menu;
 
 import java.util.ArrayList;
@@ -25,9 +22,10 @@ public class UpdateController {
     private CurrenciesGroupMenu currenciesGroupMenu;
     @Autowired
     private CurrenciesMenu currenciesMenu;
-
     @Autowired
     private TrackedCurrenciesMenu trackedCurrenciesMenu;
+    @Autowired
+    private CurrencyMenu currencyMenu;
 
     public void registerTelegramBot(TelegramBot telegramBot) {
         this.bot = telegramBot;
@@ -36,6 +34,7 @@ public class UpdateController {
         menuList.add(currenciesGroupMenu);
         menuList.add(currenciesMenu);
         menuList.add(trackedCurrenciesMenu);
+        menuList.add(currencyMenu);
     }
 
     public void processUpdate(Update update) {

@@ -1,7 +1,9 @@
-package project.controller.menuController.factory;
+package project.factory.enums;
 
 public enum CurrencyType {
-    CRYPTO("криптовалюты");
+    FIAT("фиатные валюты"),
+    CRYPTO("криптовалюты"),
+    METALS("металлы");
 
     private final String type;
 
